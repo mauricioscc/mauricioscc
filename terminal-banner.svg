@@ -1,0 +1,81 @@
+<svg viewBox="0 0 900 180" width="100%" height="180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="crt-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    .term-header {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      fill: #4ade80;
+      opacity: 0.7;
+    }
+    .term-title {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 900;
+      font-size: 46px;
+      letter-spacing: 4px;
+      fill: #39d353;
+    }
+    .term-sub {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 15px;
+      letter-spacing: 2px;
+      fill: #86efac;
+    }
+    .matrix-col {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      fill: #22c55e;
+      opacity: 0.14;
+    }
+
+    @keyframes blink-cursor {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    @keyframes rain-drop {
+      0% { transform: translateY(-40px); }
+      100% { transform: translateY(40px); }
+    }
+
+    .cursor { animation: blink-cursor 0.9s infinite; fill: #39d353; }
+    .rain-1 { animation: rain-drop 5s linear infinite alternate; }
+    .rain-2 { animation: rain-drop 7s linear infinite alternate-reverse; }
+  </style>
+
+  
+  <rect width="900" height="180" rx="8" fill="#060906" stroke="#14532d" stroke-width="1.5" />
+
+  
+  <g class="matrix-col rain-1">
+    <text x="40" y="30">01001101 10110010 00101110 11010101 01100110 10011001 01010111 11001010 00110101 10101100</text>
+    <text x="25" y="75">11010011 01101001 10010110 00111010 11100101 01001110 10110100 01100011 10011101 01010010</text>
+    <text x="55" y="120">00110110 10100101 01110010 11001101 01011010 10010011 01101110 11010100 00101011 10110001</text>
+    <text x="30" y="165">10101110 01010011 11001001 00110111 10110110 01001010 11010011 01100101 10011010 01110100</text>
+  </g>
+  <g class="matrix-col rain-2">
+    <text x="15" y="52">def init(): return True  # 0x7F4A  SELECT * FROM systems WHERE status = 'ACTIVE';</text>
+    <text x="60" y="142">git commit -m "init"  &amp;&amp;  ./run_daemon.sh --mode=production --port=8080</text>
+  </g>
+
+  
+  <rect x="0" y="0" width="900" height="26" rx="8" fill="#0d160e" />
+  <circle cx="18" cy="13" r="4.5" fill="#ef4444" opacity="0.8" />
+  <circle cx="34" cy="13" r="4.5" fill="#eab308" opacity="0.8" />
+  <circle cx="50" cy="13" r="4.5" fill="#22c55e" opacity="0.8" />
+  <text x="450" y="17" class="term-header" text-anchor="middle">mauricioscc@github: ~/profile (bash)</text>
+
+  
+  <text x="70" y="96" class="term-title" filter="url(#crt-glow)">&gt; msc</text>
+  <rect x="468" y="64" width="20" height="36" class="cursor" filter="url(#crt-glow)" />
+
+  
+  <text x="72" y="135" class="term-sub">$ whoami: Software Developer | Python • Web • Automation</text>
+</svg>
