@@ -9,8 +9,3 @@
   <source media="(prefers-color-scheme: light)" srcset="./profile-3d-contrib/profile-season-animate.svg">
   <img alt="3D contribution graph" src="./profile-3d-contrib/profile-season-animate.svg">
 </picture>
-
-
-<p align="center">
-  <img alt="3D Pac-Man Contribution Graph" src="./profile-3d-contrib/profile-night-pacman.svg">
-</p>
