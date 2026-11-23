@@ -70,11 +70,11 @@
   <circle cx="18" cy="13" r="4.5" fill="#ef4444" opacity="0.8" />
   <circle cx="34" cy="13" r="4.5" fill="#eab308" opacity="0.8" />
   <circle cx="50" cy="13" r="4.5" fill="#22c55e" opacity="0.8" />
-  <text x="450" y="17" class="term-header" text-anchor="middle">mauricioscc@github: ~/profile (bash)</text>
+  <text x="450" y="17" class="term-header" text-anchor="middle">msc@github: ~/profile (bash)</text>
 
   
   <text x="70" y="96" class="term-title" filter="url(#crt-glow)">&gt; msc</text>
-  <rect x="468" y="64" width="20" height="36" class="cursor" filter="url(#crt-glow)" />
+  <rect x="245" y="64" width="20" height="36" class="cursor" filter="url(#crt-glow)" />
 
   
   <text x="72" y="135" class="term-sub">$ whoami: Software Developer | Python • Web • Automation</text>
