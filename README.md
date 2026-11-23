@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./terminal-banner.svg" alt="Header Banner" width="100%">
+</p>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/mauricioscc/mauricioscc/output/pacman-contribution-graph-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/mauricioscc/mauricioscc/output/pacman-contribution-graph.svg">
