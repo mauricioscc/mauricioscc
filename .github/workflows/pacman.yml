@@ -25,6 +25,8 @@ jobs:
         uses: abozanona/pacman-contribution-graph@main
         with:
           github_user_name: ${{ github.repository_owner }}
+          # PROFILE_TOKEN (PAT com read:user) permite contar contribuições privadas
+          github_token: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: push pacman-contribution-graph.svg to the output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
