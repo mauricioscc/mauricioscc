@@ -27,6 +27,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
+          SETTING_JSON: >
+            {
+              "backgroundColor": "#060906",
+              "foregroundColor": "#39d353",
+              "strongColor": "#4ade80",
+              "weakColor": "#14532d",
+              "radarColor": "#39d353",
+              "contribColors": ["#0d160e", "#0e4429", "#006d32", "#26a641", "#39d353"]
+            }
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -44,18 +53,3 @@ jobs:
           git commit -m "chore: update 3D Pac-Man contribution graph" || exit 0
           git push
 
-
-
-          - uses: yoshi389111/github-profile-3d-contrib@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.repository_owner }}
-          SETTING_JSON: >
-            {
-              "backgroundColor": "#060906",
-              "foregroundColor": "#39d353",
-              "strongColor": "#4ade80",
-              "weakColor": "#14532d",
-              "radarColor": "#39d353",
-              "contribColors": ["#0d160e", "#0e4429", "#006d32", "#26a641", "#39d353"]
-            }

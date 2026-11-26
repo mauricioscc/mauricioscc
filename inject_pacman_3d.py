@@ -6,89 +6,68 @@ from pathlib import Path
 INPUT_SVG = Path("profile-3d-contrib/profile-night-green.svg")
 OUTPUT_SVG = Path("profile-3d-contrib/profile-night-pacman.svg")
 
-# Cores usadas pelo profile-3d-contrib (tema night-green)
-FLOOR_COLORS = {"#2d333b", "#161b22", "#ebedf0", "#22272e"}
-ACTIVE_COLORS = {"#0e4429", "#006d32", "#26a641", "#39d353"}
 
+SVG_NS = "http://www.w3.org/2000/svg"
+TRANSLATE_RE = re.compile(r"translate\(\s*([-\d.]+)[ ,]+([-\d.]+)\s*\)")
+TOP_CLASS_RE = re.compile(r"cont-top-(\d+)")
 
-def parse_points(points_str: str):
-    nums = [float(v) for v in re.findall(r"[-+]?\d*\.?\d+", points_str)]
-    return [(nums[i], nums[i + 1]) for i in range(0, len(nums) - 1, 2)]
-
-
-def polygon_centroid(pts):
-    return sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts)
+# Geometria isométrica do profile-3d-contrib: cada célula vale 20px em x
+# e 11,547px (20 * tan 30°) em y por passo de coluna/linha.
+STEP_X = 20.0
+STEP_Y = 11.547
+CELL_CENTER_DX = 18.0  # centro do losango em relação ao translate do grupo
 
 
 def extract_grid_cells(root):
     """
-    Lê todos os losangos do piso no SVG do profile-3d-contrib e reconstrói
-    a matriz (semana, dia) -> (cx, cy, tem_bloco, elemento_grupo).
-    """
-    candidates = []
+    Lê as células do SVG do profile-3d-contrib. Cada célula é um <g
+    transform="translate(x y)"> com 3 <rect> (topo, lado esquerdo, lado
+    direito); a classe "cont-top-N" do topo traz o nível de contribuição (N>0
+    = dia com contribuições). A ordem no documento é semana a semana (7 dias).
 
-    # Mapeia cada <polygon> ao seu <g> pai para poder animar o bloco inteiro depois
+    Retorna {(semana, dia): {cx, cy, active, group, parent}} onde (cx, cy) é
+    o centro do losango no piso (sem a altura do bloco).
+    """
     parent_map = {child: parent for parent in root.iter() for child in parent}
 
-    for poly in root.iter():
-        if not poly.tag.endswith("polygon"):
+    cells = []
+    for g in root.iter(f"{{{SVG_NS}}}g"):
+        m = TRANSLATE_RE.fullmatch(g.attrib.get("transform", "").strip())
+        if not m:
             continue
-        pts_attr = poly.attrib.get("points", "")
-        pts = parse_points(pts_attr)
-        if len(pts) != 4:
+        rects = [c for c in g if c.tag == f"{{{SVG_NS}}}rect"]
+        if len(rects) != 3:
             continue
+        top = TOP_CLASS_RE.fullmatch(rects[0].attrib.get("class", ""))
+        if not top:
+            continue
+        cells.append((float(m.group(1)), float(m.group(2)), int(top.group(1)), g))
 
-        xs = [p[0] for p in pts]
-        ys = [p[1] for p in pts]
-        w = max(xs) - min(xs)
-        h = max(ys) - min(ys)
-
-        # Losangos do tabuleiro isométrico têm proporção ~2:1 e largura ~12-18px
-        if 8.0 <= w <= 26.0 and 4.0 <= h <= 14.0 and abs((w / h) - 2.0) < 0.35:
-            cx, cy = polygon_centroid(pts)
-            fill = (poly.attrib.get("fill") or "").lower()
-            candidates.append((cx, cy, fill, parent_map.get(poly)))
-
-    if not candidates:
+    if not cells:
         raise RuntimeError("Não foi possível localizar as células isométricas no SVG.")
 
-    # Projeta no espaço da grade isométrica: u = cx/dx + cy/dy (semana), v = cy/dy - cx/dx (dia)
-    # No profile-3d-contrib, dx ~= 8.66 e dy ~= 5.0 (razão sqrt(3):1 ou 2:1)
-    dx, dy = 8.66025, 5.0
-    projected = []
-    for cx, cy, fill, grp in candidates:
-        u = (cx / dx + cy / dy) / 2.0
-        v = (cy / dy - cx / dx) / 2.0
-        projected.append((u, v, cx, cy, fill, grp))
+    # x não depende da altura do bloco; y só é confiável nas células sem
+    # contribuição (altura mínima), então ancoramos o piso nelas.
+    x0 = cells[0][0]
+    y0 = None
+    for i, (_, y, level, _g) in enumerate(cells):
+        if level == 0:
+            col, row = divmod(i, 7)
+            y0 = y - STEP_Y * (col + row)
+            break
+    if y0 is None:
+        raise RuntimeError("Nenhuma célula sem contribuição para calibrar o piso do SVG.")
 
-    u_min = min(p[0] for p in projected)
-    v_min = min(p[1] for p in projected)
-
-    # Agrupa pelo ponto mais baixo (piso) de cada coluna (semana, dia)
     grid = {}
-    for u, v, cx, cy, fill, grp in projected:
-        col = round(u - u_min)
-        row = round(v - v_min)
-        if not (0 <= col <= 53 and 0 <= row <= 6):
-            continue
-
-        is_active = fill in ACTIVE_COLORS
-        # Mantém a coordenada base (maior cy = base do bloco no piso)
-        if (col, row) not in grid:
-            grid[(col, row)] = {
-                "cx": cx,
-                "cy": cy,
-                "active": is_active,
-                "group": grp,
-            }
-        else:
-            if cy > grid[(col, row)]["cy"]:
-                grid[(col, row)]["cx"] = cx
-                grid[(col, row)]["cy"] = cy
-            if is_active:
-                grid[(col, row)]["active"] = True
-                grid[(col, row)]["group"] = grp
-
+    for i, (_, _, level, g) in enumerate(cells):
+        col, row = divmod(i, 7)
+        grid[(col, row)] = {
+            "cx": x0 + STEP_X * (col - row) + CELL_CENTER_DX,
+            "cy": y0 + STEP_Y * (col + row),
+            "active": level > 0,
+            "group": g,
+            "parent": parent_map.get(g),
+        }
     return grid
 
 
@@ -141,8 +120,13 @@ def main():
         info = grid[cell]
         if info["active"] and info["group"] is not None:
             cls_name = f"eat-block-{cell[0]}-{cell[1]}"
-            existing_cls = info["group"].attrib.get("class", "")
-            info["group"].attrib["class"] = f"{existing_cls} {cls_name}".strip()
+            # O CSS "transform" sobrescreve o atributo transform="translate(...)"
+            # do grupo; por isso a animação vai num <g> envoltório.
+            group, parent = info["group"], info["parent"]
+            wrapper = ET.Element(f"{{{SVG_NS}}}g", {"class": cls_name})
+            parent.insert(list(parent).index(group), wrapper)
+            parent.remove(group)
+            wrapper.append(group)
 
             pct = (step_idx / total_steps) * 100.0
             pct_after = min(pct + 0.6, 99.5)
