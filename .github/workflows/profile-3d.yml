@@ -27,15 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
-          SETTING_JSON: >
-            {
-              "backgroundColor": "#060906",
-              "foregroundColor": "#39d353",
-              "strongColor": "#4ade80",
-              "weakColor": "#14532d",
-              "radarColor": "#39d353",
-              "contribColors": ["#0d160e", "#0e4429", "#006d32", "#26a641", "#39d353"]
-            }
+          SETTING_JSON: ./profile-3d-settings.json
 
       - name: Set up Python
         uses: actions/setup-python@v5
