@@ -28,7 +28,6 @@ jobs:
           # PROFILE_TOKEN (PAT com read:user) permite contar contribuições privadas
           GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
-          SETTING_JSON: ./profile-3d-settings.json
 
       - name: Set up Python
         uses: actions/setup-python@v5
